@@ -1,0 +1,117 @@
+=========================================================
+  AUTOMATIZADOR DE BOLETAS DE HONORARIOS ELECTRONICAS
+  Instrucciones de instalacion y uso
+=========================================================
+
+REQUISITOS PREVIOS
+------------------
+1. Tener instalado Google Chrome en el computador.
+   Descarga: https://www.google.com/chrome
+   (La aplicacion no funciona sin Chrome instalado)
+
+2. Conexion a internet activa durante el uso.
+
+
+INSTALACION
+-----------
+1. Ejecutar el archivo:
+      Instalador_AutomatizadorBoletas.exe
+
+2. Seguir los pasos del asistente de instalacion.
+
+3. Al finalizar, aparecera un acceso directo en el
+   Escritorio llamado "Automatizador de Boletas".
+
+
+COMO USAR LA APLICACION
+------------------------
+
+-- MODO INDIVIDUAL (una boleta a la vez) --
+
+1. Abrir la aplicacion desde el acceso directo.
+2. Ir a la pestana "Individual".
+3. Ingresar:
+     - RUT emisor        -> RUT de quien emite la boleta
+     - Clave SII         -> Contrasena del portal SII
+     - RUT destinatario  -> RUT sin puntos, sin digito verificador
+     - DV                -> Solo el digito verificador (ej: 7, K)
+     - Nombres           -> Nombre o razon social del destinatario
+     - Domicilio         -> Direccion del destinatario
+     - Region            -> Nombre o codigo de la region
+     - Comuna            -> Nombre o codigo de la comuna
+     - Prestacion 1      -> Descripcion del servicio (obligatorio)
+     - Valor 1           -> Monto en pesos (obligatorio)
+     - Prestaciones 2-4  -> Opcionales
+4. Presionar "Emitir Boleta".
+5. Seguir el progreso en el panel derecho.
+
+
+-- MODO MASIVO (varias boletas desde Excel) --
+
+1. Preparar el archivo Excel usando la plantilla incluida:
+      Plantilla_Boletas.xlsx
+
+   Completar una fila por cada boleta a emitir.
+   Columnas requeridas:
+     RUT            -> RUT del emisor (sin puntos, sin guion)
+     CLAVE          -> Clave SII del emisor
+     RUT-DEST       -> RUT del destinatario (sin puntos, sin digito verificador)
+     RUT-CV         -> Digito verificador del destinatario
+     NOMBRE-DEST    -> Nombre o razon social del destinatario
+     DOMICILIO-DEST -> Direccion del destinatario
+     REGION         -> Nombre o codigo de la region
+     COMUNA         -> Nombre o codigo de la comuna
+     PRESTACION     -> Descripcion del servicio
+     VALOR          -> Monto en pesos
+
+2. Abrir la aplicacion y ir a la pestana "Masivo (Excel)".
+3. Presionar "Cargar Excel" y seleccionar el archivo.
+4. Verificar que los datos aparezcan correctamente en la tabla.
+5. Presionar "Iniciar todo el Excel".
+6. Las boletas se procesan una por una de forma automatica.
+   El estado de cada fila se actualiza en tiempo real.
+7. Para detener el proceso usar "Detener"
+   (espera a terminar la boleta actual antes de parar).
+
+
+SELECTOR DE VISTA
+-----------------
+En la parte superior de la aplicacion hay un selector
+que permite ajustar la interfaz a distintos tamanios:
+  - PC     -> Vista estandar de escritorio
+  - Tablet -> Vista intermedia
+  - Movil  -> Vista compacta
+
+
+PROBLEMAS FRECUENTES
+--------------------
+* "No se inicia el navegador"
+  -> Verificar que Google Chrome este instalado.
+
+* "Login rechazado"
+  -> Verificar que el RUT y la clave SII sean correctos.
+     El RUT emisor debe incluir puntos y guion (ej: 76.123.456-7).
+
+* "No se encontro 'Por contribuyente'"
+  -> El SII puede haber cambiado su sitio web.
+     Contactar al desarrollador.
+
+* La aplicacion se cierra al intentar abrir un Excel
+  -> Verificar que el archivo no este abierto en Excel
+     al momento de cargarlo en la aplicacion.
+
+
+ARCHIVOS INCLUIDOS
+------------------
+  Instalador_AutomatizadorBoletas.exe  -> Instalador principal
+  Plantilla_Boletas.xlsx               -> Modelo de Excel para modo masivo
+  INSTRUCCIONES.txt                    -> Este archivo
+
+
+SOPORTE
+-------
+Ante cualquier problema consulta dentro de tu corazon
+y veras una luz, siguela y estare para guiarte.
+Sino, escribeme un correo.
+
+=========================================================
