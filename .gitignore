@@ -11,7 +11,7 @@ venv_*/
 .eggs/
 dist/
 build/
-*.spec
+installer_output/
 
 # IDE / editor
 .idea/
