@@ -6,6 +6,13 @@ Toda la lógica de automatización está en core/boleta_automator.py.
 """
 import sys
 import os
+import io
+
+# Fix encoding para terminales Windows (cp1252 no soporta emojis)
+if sys.stdout and hasattr(sys.stdout, 'buffer'):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr and hasattr(sys.stderr, 'buffer'):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 def get_base_path():
     if getattr(sys, "frozen", False):
