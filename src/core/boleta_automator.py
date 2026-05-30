@@ -20,6 +20,7 @@ import re
 import calendar
 from datetime import date
 from selenium import webdriver
+import selenium.webdriver.chrome.webdriver  # importación explícita para evitar fallo en QThread
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By

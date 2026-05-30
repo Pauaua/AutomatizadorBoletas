@@ -94,6 +94,7 @@ class BoletaGUI(QMainWindow):
         self.excel_df = None
         self.excel_cols = None
         self.masivo_detenido = False
+        self.masivo_resultados = []   # acumula dict por fila para reporte final
         self.init_ui()
 
     # Perfiles de vista:
@@ -505,6 +506,7 @@ class BoletaGUI(QMainWindow):
             QMessageBox.warning(self, "Advertencia", "Cargue un Excel con al menos una fila.")
             return
         self.masivo_detenido = False
+        self.masivo_resultados = []
         self.start_masivo_btn.setEnabled(False)
         self.stop_masivo_btn.setEnabled(True)
         self._log_masivo("🚀 Iniciando procesamiento masivo (secuencial)...")
@@ -581,12 +583,71 @@ class BoletaGUI(QMainWindow):
         estado = "✅ Éxito" if exito else "❌ Fallo"
         self.table_masivo.setItem(row_idx, 4, QTableWidgetItem(estado))
         self._log_masivo(f"🏁 Fila {row_idx + 1}: {mensaje}")
+        self.masivo_resultados.append({
+            "Fila":           row_idx + 1,
+            "RUT Emisor":     self.table_masivo.item(row_idx, 0).text() if self.table_masivo.item(row_idx, 0) else "",
+            "RUT Destinatario": self.table_masivo.item(row_idx, 1).text() if self.table_masivo.item(row_idx, 1) else "",
+            "Prestación 1":   self.table_masivo.item(row_idx, 2).text() if self.table_masivo.item(row_idx, 2) else "",
+            "Monto":          self.table_masivo.item(row_idx, 3).text() if self.table_masivo.item(row_idx, 3) else "",
+            "Estado":         "Éxito" if exito else "Fallo",
+            "Detalle":        mensaje,
+        })
         self._procesar_siguiente_fila_masivo(row_idx + 1)
 
     def _finalizar_masivo(self):
         self._log_masivo("🎉 Fin del procesamiento masivo.")
         self.start_masivo_btn.setEnabled(True)
         self.stop_masivo_btn.setEnabled(False)
+        self._exportar_reporte_masivo()
+
+    def _exportar_reporte_masivo(self):
+        if not self.masivo_resultados:
+            return
+        try:
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            nombre_base = os.path.splitext(os.path.basename(self.excel_path))[0] if self.excel_path else "reporte"
+            directorio = os.path.dirname(self.excel_path) if self.excel_path else os.path.expanduser("~")
+            nombre_archivo = f"{nombre_base}_reporte_{timestamp}.xlsx"
+            ruta_reporte = os.path.join(directorio, nombre_archivo)
+
+            df_reporte = pd.DataFrame(self.masivo_resultados)
+            exitosos = (df_reporte["Estado"] == "Éxito").sum()
+            fallidos  = (df_reporte["Estado"] == "Fallo").sum()
+
+            with pd.ExcelWriter(ruta_reporte, engine="openpyxl") as writer:
+                df_reporte.to_excel(writer, index=False, sheet_name="Resultados")
+                ws = writer.sheets["Resultados"]
+
+                # Ajustar ancho de columnas
+                for col in ws.columns:
+                    max_len = max((len(str(cell.value or "")) for cell in col), default=10)
+                    ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 60)
+
+                # Colorear filas por estado
+                from openpyxl.styles import PatternFill, Font
+                verde  = PatternFill("solid", fgColor="C6EFCE")
+                rojo   = PatternFill("solid", fgColor="FFC7CE")
+                bold   = Font(bold=True)
+                for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+                    estado_cell = row[5]  # columna "Estado"
+                    fill = verde if estado_cell.value == "Éxito" else rojo
+                    for cell in row:
+                        cell.fill = fill
+
+                # Fila resumen al final
+                ws.append([])
+                ws.append(["", "", "", "", "Total procesados:", len(self.masivo_resultados)])
+                ws.append(["", "", "", "", "Exitosos:",  int(exitosos)])
+                ws.append(["", "", "", "", "Fallidos:",  int(fallidos)])
+                for summary_row in ws.iter_rows(min_row=ws.max_row - 2, max_row=ws.max_row):
+                    for cell in summary_row:
+                        cell.font = bold
+
+            self._log_masivo(f"📄 Reporte guardado: {nombre_archivo}")
+            self._log_masivo(f"   ✅ Exitosos: {exitosos}  ❌ Fallidos: {fallidos}")
+        except Exception as e:
+            self._log_masivo(f"⚠️ No se pudo guardar el reporte: {e}")
 
     def _detener_proceso_masivo(self):
         self.masivo_detenido = True
